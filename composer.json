@@ -1,0 +1,28 @@
+{
+    "name": "glynnforrest/speedy-config",
+    "description": "No-fuss configuration loader, processor and cache",
+    "type": "library",
+    "require": {
+        "glynnforrest/crutches": "^0.3.2"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.2"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Glynn Forrest",
+            "email": "me@glynnforrest.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "SpeedyConfig\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "SpeedyConfig\\Tests\\": "tests"
+        }
+    }
+}
