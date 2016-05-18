@@ -85,4 +85,27 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
         $this->setExpectedException('SpeedyConfig\ResourceException', 'There is no configuration loader available to load the resource "invalid.txt"');
         $this->resolver->getConfig();
     }
+
+    public function testLoadResourceWithPrefix()
+    {
+        $loader = $this->getMock('SpeedyConfig\Loader\LoaderInterface');
+        $loader->expects($this->any())
+            ->method('supports')
+            ->will($this->returnValue(true));
+        $loader->expects($this->any())
+            ->method('load')
+            ->will($this->returnValue(['something' => ['foo' => 'bar']]));
+        $this->resolver->addLoader($loader);
+
+        $this->resolver->addResource('some_resource', 'some_prefix');
+
+        $config = $this->resolver->getConfig();
+        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $expected = [
+            'some_prefix' => [
+                'something' => ['foo' => 'bar'],
+            ],
+        ];
+        $this->assertSame($expected, $config->get());
+    }
 }

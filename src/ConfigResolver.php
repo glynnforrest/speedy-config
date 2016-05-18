@@ -16,13 +16,14 @@ class ConfigResolver
     protected $loaders = [];
 
     /**
-     * Add a resource to load.
+     * Add a resource to load configuration values from.
      *
-     * @param string $resource
+     * @param mixed       $resource
+     * @param string|null $prefix   The prefix to give the values, if any
      */
-    public function addResource($resource)
+    public function addResource($resource, $prefix = null)
     {
-        $this->resources[] = $resource;
+        $this->resources[] = [$resource, $prefix];
     }
 
     public function addLoader(LoaderInterface $loader)
@@ -34,7 +35,7 @@ class ConfigResolver
      * Load a resource using a loader. The first loader that supports
      * the resource will be used.
      *
-     * @param string $resource
+     * @param mixed $resource
      *
      * @throws ResourceException
      *
@@ -63,7 +64,14 @@ class ConfigResolver
         $config = new Config();
 
         foreach ($this->resources as $resource) {
-            $config->merge($this->loadResource($resource));
+            $values = $this->loadResource($resource[0]);
+            if (is_string($prefix = $resource[1])) {
+                $values = [
+                    $prefix => $values,
+                ];
+            }
+
+            $config->merge($values);
         }
 
         return $config;
