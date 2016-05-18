@@ -108,4 +108,12 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
         ];
         $this->assertSame($expected, $config->get());
     }
+
+    public function testLoadArray()
+    {
+        $this->resolver->addResource(['one' => 1, 'two' => 2]);
+        $config = $this->resolver->getConfig();
+        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $this->assertSame(['one' => 1, 'two' => 2], $config->get());
+    }
 }

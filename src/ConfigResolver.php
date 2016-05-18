@@ -43,6 +43,10 @@ class ConfigResolver
      */
     protected function loadResource($resource)
     {
+        if (is_array($resource)) {
+            return $resource;
+        }
+
         foreach ($this->loaders as $loader) {
             if (!$loader->supports($resource)) {
                 continue;
