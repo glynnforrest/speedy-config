@@ -116,4 +116,16 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('SpeedyConfig\Config', $config);
         $this->assertSame(['one' => 1, 'two' => 2], $config->get());
     }
+
+    public function testProcessorIsCalledAfterMerge()
+    {
+        $processor = $this->getMock('SpeedyConfig\Processor\ProcessorInterface');
+        $processor->expects($this->once())
+            ->method('onPostMerge')
+            ->with($this->callback(function($arg) {
+                return $arg instanceof \SpeedyConfig\Config;
+            }));
+        $this->resolver->addProcessor($processor);
+        $this->resolver->getConfig();
+    }
 }

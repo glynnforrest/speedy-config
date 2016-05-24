@@ -3,6 +3,7 @@
 namespace SpeedyConfig;
 
 use SpeedyConfig\Loader\LoaderInterface;
+use SpeedyConfig\Processor\ProcessorInterface;
 
 /**
  * ConfigResolver loads various resources, processes the
@@ -14,6 +15,7 @@ class ConfigResolver
 {
     protected $resources = [];
     protected $loaders = [];
+    protected $processors = [];
 
     /**
      * Add a resource to load configuration values from.
@@ -26,9 +28,24 @@ class ConfigResolver
         $this->resources[] = [$resource, $prefix];
     }
 
+    /**
+     * Add a configuration loader.
+     *
+     * @param LoaderInterface $loader
+     */
     public function addLoader(LoaderInterface $loader)
     {
         $this->loaders[] = $loader;
+    }
+
+    /**
+     * Add a configuration processor.
+     *
+     * @param ProcessorInterface $processor
+     */
+    public function addProcessor(ProcessorInterface $processor)
+    {
+        $this->processors[] = $processor;
     }
 
     /**
@@ -76,6 +93,10 @@ class ConfigResolver
             }
 
             $config->merge($values);
+        }
+
+        foreach ($this->processors as $processor) {
+            $processor->onPostMerge($config);
         }
 
         return $config;
