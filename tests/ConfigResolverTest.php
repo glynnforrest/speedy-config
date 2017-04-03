@@ -24,7 +24,7 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testAddResource()
     {
-        $loader = $this->getMock('SpeedyConfig\Loader\LoaderInterface');
+        $loader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
         $loader->expects($this->any())
             ->method('supports')
             ->with('config.yml')
@@ -43,7 +43,7 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testResourcesAreLoadedLazily()
     {
-        $loader = $this->getMock('SpeedyConfig\Loader\LoaderInterface');
+        $loader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
         $loader->expects($this->never())
             ->method('load');
 
@@ -55,14 +55,14 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
     {
         $this->resolver->addResource('config.yml');
 
-        $jsonLoader = $this->getMock('SpeedyConfig\Loader\LoaderInterface');
+        $jsonLoader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
         $jsonLoader->expects($this->any())
             ->method('supports')
             ->with('config.yml')
             ->will($this->returnValue(false));
         $this->resolver->addLoader($jsonLoader);
 
-        $yamlLoader = $this->getMock('SpeedyConfig\Loader\LoaderInterface');
+        $yamlLoader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
         $yamlLoader->expects($this->any())
             ->method('supports')
             ->with('config.yml')
@@ -88,7 +88,7 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadResourceWithPrefix()
     {
-        $loader = $this->getMock('SpeedyConfig\Loader\LoaderInterface');
+        $loader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
         $loader->expects($this->any())
             ->method('supports')
             ->will($this->returnValue(true));
@@ -119,7 +119,7 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testProcessorIsCalledAfterMerge()
     {
-        $processor = $this->getMock('SpeedyConfig\Processor\ProcessorInterface');
+        $processor = $this->createMock('SpeedyConfig\Processor\ProcessorInterface');
         $processor->expects($this->once())
             ->method('onPostMerge')
             ->with($this->callback(function($arg) {
