@@ -2,29 +2,28 @@
 
 namespace SpeedyConfig\Tests;
 
-use SpeedyConfig\ConfigResolver;
+use SpeedyConfig\ConfigBuilder;
+use SpeedyConfig\Config;
+use SpeedyConfig\Loader\LoaderInterface;
+use SpeedyConfig\ResourceException;
+use SpeedyConfig\Processor\ProcessorInterface;
 
 /**
- * ConfigResolverTest
+ * ConfigBuilderTest
  *
  * @author Glynn Forrest <me@glynnforrest.com>
  **/
-class ConfigResolverTest extends \PHPUnit_Framework_TestCase
+class ConfigBuilderTest extends \PHPUnit_Framework_TestCase
 {
-    public function setUp()
-    {
-        $this->resolver = new ConfigResolver();
-    }
-
     public function testGetEmptyConfig()
     {
-        $config = $this->resolver->getConfig();
-        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $builder = new ConfigBuilder();
+        $this->assertInstanceOf(Config::class, $builder->getConfig());
     }
 
     public function testAddResource()
     {
-        $loader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
+        $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
             ->method('supports')
             ->with('config.yml')
@@ -33,11 +32,11 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->with('config.yml')
             ->will($this->returnValue(['foo' => 'bar']));
+        $builder = new ConfigBuilder($loader);
+        $builder->addResource('config.yml');
+        $config = $builder->getConfig();
 
-        $this->resolver->addLoader($loader);
-        $this->resolver->addResource('config.yml');
-        $config = $this->resolver->getConfig();
-        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $this->assertInstanceOf(Config::class, $config);
         $this->assertSame(['foo' => 'bar'], $config->get());
     }
 
@@ -46,23 +45,19 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
         $loader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
         $loader->expects($this->never())
             ->method('load');
-
-        $this->resolver->addLoader($loader);
-        $this->resolver->addResource('config.yml');
+        $builder = new ConfigBuilder($loader);
+        $builder->addResource('config.yml');
     }
 
     public function testCorrectLoaderIsUsed()
     {
-        $this->resolver->addResource('config.yml');
-
-        $jsonLoader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
+        $jsonLoader = $this->createMock(LoaderInterface::class);
         $jsonLoader->expects($this->any())
             ->method('supports')
             ->with('config.yml')
             ->will($this->returnValue(false));
-        $this->resolver->addLoader($jsonLoader);
 
-        $yamlLoader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
+        $yamlLoader = $this->createMock(LoaderInterface::class);
         $yamlLoader->expects($this->any())
             ->method('supports')
             ->with('config.yml')
@@ -72,35 +67,37 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
             ->method('load')
             ->with('config.yml')
             ->will($this->returnValue(['something' => ['foo' => 'bar']]));
-        $this->resolver->addLoader($yamlLoader);
 
-        $config = $this->resolver->getConfig();
-        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $builder = new ConfigBuilder([$jsonLoader, $yamlLoader]);
+        $builder->addResource('config.yml');
+
+        $config = $builder->getConfig();
+        $this->assertInstanceOf(Config::class, $config);
         $this->assertSame(['foo' => 'bar'], $config->get('something'));
     }
 
     public function testLoadFailsWithNoSuitableLoader()
     {
-        $this->resolver->addResource('invalid.txt');
-        $this->setExpectedException('SpeedyConfig\ResourceException', 'There is no configuration loader available to load the resource "invalid.txt"');
-        $this->resolver->getConfig();
+        $builder = new ConfigBuilder();
+        $builder->addResource('invalid.txt');
+        $this->setExpectedException(ResourceException::class, 'There is no configuration loader available to load the resource "invalid.txt"');
+        $builder->getConfig();
     }
 
     public function testLoadResourceWithPrefix()
     {
-        $loader = $this->createMock('SpeedyConfig\Loader\LoaderInterface');
+        $loader = $this->createMock(LoaderInterface::class);
         $loader->expects($this->any())
             ->method('supports')
             ->will($this->returnValue(true));
         $loader->expects($this->any())
             ->method('load')
             ->will($this->returnValue(['something' => ['foo' => 'bar']]));
-        $this->resolver->addLoader($loader);
+        $builder = new ConfigBuilder($loader);
+        $builder->addResource('some_resource', 'some_prefix');
 
-        $this->resolver->addResource('some_resource', 'some_prefix');
-
-        $config = $this->resolver->getConfig();
-        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $config = $builder->getConfig();
+        $this->assertInstanceOf(Config::class, $config);
         $expected = [
             'some_prefix' => [
                 'something' => ['foo' => 'bar'],
@@ -111,21 +108,22 @@ class ConfigResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadArray()
     {
-        $this->resolver->addResource(['one' => 1, 'two' => 2]);
-        $config = $this->resolver->getConfig();
-        $this->assertInstanceOf('SpeedyConfig\Config', $config);
+        $builder = new ConfigBuilder();
+        $builder->addResource(['one' => 1, 'two' => 2]);
+        $config = $builder->getConfig();
+        $this->assertInstanceOf(Config::class, $config);
         $this->assertSame(['one' => 1, 'two' => 2], $config->get());
     }
 
     public function testProcessorIsCalledAfterMerge()
     {
-        $processor = $this->createMock('SpeedyConfig\Processor\ProcessorInterface');
+        $processor = $this->createMock(ProcessorInterface::class);
         $processor->expects($this->once())
             ->method('onPostMerge')
             ->with($this->callback(function($arg) {
-                return $arg instanceof \SpeedyConfig\Config;
+                return $arg instanceof Config;
             }));
-        $this->resolver->addProcessor($processor);
-        $this->resolver->getConfig();
+        $builder = new ConfigBuilder([], $processor);
+        $builder->getConfig();
     }
 }

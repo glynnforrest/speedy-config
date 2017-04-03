@@ -6,16 +6,23 @@ use SpeedyConfig\Loader\LoaderInterface;
 use SpeedyConfig\Processor\ProcessorInterface;
 
 /**
- * ConfigResolver loads various resources, processes the
- * configuration, and returns a single resolved Config instance.
+ * ConfigBuilder loads resources using the supplied loaders, processes
+ * the configuration using the supplied processors, and returns a
+ * single resolved Config instance.
  *
  * @author Glynn Forrest <me@glynnforrest.com>
  **/
-class ConfigResolver
+class ConfigBuilder
 {
     protected $resources = [];
     protected $loaders = [];
     protected $processors = [];
+
+    public function __construct($loaders = [], $processors = [])
+    {
+        $this->loaders = is_array($loaders) ? $loaders : [$loaders];
+        $this->processors = is_array($processors) ? $processors : [$processors];
+    }
 
     /**
      * Add a resource to load configuration values from.
@@ -26,26 +33,6 @@ class ConfigResolver
     public function addResource($resource, $prefix = null)
     {
         $this->resources[] = [$resource, $prefix];
-    }
-
-    /**
-     * Add a configuration loader.
-     *
-     * @param LoaderInterface $loader
-     */
-    public function addLoader(LoaderInterface $loader)
-    {
-        $this->loaders[] = $loader;
-    }
-
-    /**
-     * Add a configuration processor.
-     *
-     * @param ProcessorInterface $processor
-     */
-    public function addProcessor(ProcessorInterface $processor)
-    {
-        $this->processors[] = $processor;
     }
 
     /**
