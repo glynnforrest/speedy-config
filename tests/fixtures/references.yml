@@ -1,0 +1,8 @@
+config:
+    database:
+        one:
+            user: root
+            password: hunter2
+        two:
+            user: '%config.database.one.user%'
+            password: '%config.database.one.password%'
