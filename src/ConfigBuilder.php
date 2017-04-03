@@ -30,6 +30,8 @@ class ConfigBuilder
     public function addResource($resource, $prefix = null)
     {
         $this->resources[] = [$resource, $prefix, true];
+
+        return $this;
     }
 
     /**
@@ -41,6 +43,8 @@ class ConfigBuilder
     public function addOptionalResource($resource, $prefix = null)
     {
         $this->resources[] = [$resource, $prefix, false];
+
+        return $this;
     }
 
     /**

@@ -157,4 +157,11 @@ class ConfigBuilderTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(Config::class, $builder->getConfig());
     }
+
+    public function testResourceCallsCanBeChained()
+    {
+        $builder = new ConfigBuilder();
+        $this->assertSame($builder, $builder->addResource('foo'));
+        $this->assertSame($builder, $builder->addOptionalResource('foo'));
+    }
 }
