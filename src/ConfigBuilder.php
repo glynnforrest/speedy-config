@@ -2,9 +2,6 @@
 
 namespace SpeedyConfig;
 
-use SpeedyConfig\Loader\LoaderInterface;
-use SpeedyConfig\Processor\ProcessorInterface;
-
 /**
  * ConfigBuilder loads resources using the supplied loaders, processes
  * the configuration using the supplied processors, and returns a
@@ -32,7 +29,18 @@ class ConfigBuilder
      */
     public function addResource($resource, $prefix = null)
     {
-        $this->resources[] = [$resource, $prefix];
+        $this->resources[] = [$resource, $prefix, true];
+    }
+
+    /**
+     * Add an optional resource to load configuration values from.
+     *
+     * @param mixed       $resource
+     * @param string|null $prefix   The prefix to give the values, if any
+     */
+    public function addOptionalResource($resource, $prefix = null)
+    {
+        $this->resources[] = [$resource, $prefix, false];
     }
 
     /**
@@ -40,12 +48,13 @@ class ConfigBuilder
      * the resource will be used.
      *
      * @param mixed $resource
+     * @param bool  $required
      *
      * @throws ResourceException
      *
      * @return array
      */
-    protected function loadResource($resource)
+    protected function loadResource($resource, $required)
     {
         if (is_array($resource)) {
             return $resource;
@@ -56,7 +65,15 @@ class ConfigBuilder
                 continue;
             }
 
-            return $loader->load($resource);
+            try {
+                return $loader->load($resource);
+            } catch (ResourceNotFoundException $e) {
+                if ($required) {
+                    throw $e;
+                }
+
+                return [];
+            }
         }
 
         throw new ResourceException(sprintf('There is no configuration loader available to load the resource "%s"', $resource));
@@ -72,7 +89,7 @@ class ConfigBuilder
         $config = new Config();
 
         foreach ($this->resources as $resource) {
-            $values = $this->loadResource($resource[0]);
+            $values = $this->loadResource($resource[0], $resource[2]);
             if (is_string($prefix = $resource[1])) {
                 $values = [
                     $prefix => $values,

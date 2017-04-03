@@ -7,6 +7,7 @@ use SpeedyConfig\Config;
 use SpeedyConfig\Loader\LoaderInterface;
 use SpeedyConfig\ResourceException;
 use SpeedyConfig\Processor\ProcessorInterface;
+use SpeedyConfig\ResourceNotFoundException;
 
 /**
  * ConfigBuilderTest
@@ -125,5 +126,35 @@ class ConfigBuilderTest extends \PHPUnit_Framework_TestCase
             }));
         $builder = new ConfigBuilder([], $processor);
         $builder->getConfig();
+    }
+
+    public function testLoadUnknownResource()
+    {
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->any())
+            ->method('supports')
+            ->will($this->returnValue(true));
+        $loader->expects($this->any())
+            ->method('load')
+            ->will($this->throwException(new ResourceNotFoundException()));
+        $builder = new ConfigBuilder($loader);
+        $builder->addResource('not_a_resource');
+        $this->setExpectedException(ResourceNotFoundException::class);
+        $builder->getConfig();
+    }
+
+    public function testLoadUnknownOptionalResource()
+    {
+        $loader = $this->createMock(LoaderInterface::class);
+        $loader->expects($this->any())
+            ->method('supports')
+            ->will($this->returnValue(true));
+        $loader->expects($this->any())
+            ->method('load')
+            ->will($this->throwException(new ResourceNotFoundException()));
+        $builder = new ConfigBuilder($loader);
+        $builder->addOptionalResource('not_a_resource');
+
+        $this->assertInstanceOf(Config::class, $builder->getConfig());
     }
 }
