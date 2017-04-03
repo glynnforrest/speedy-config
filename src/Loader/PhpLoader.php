@@ -3,9 +3,10 @@
 namespace SpeedyConfig\Loader;
 
 use SpeedyConfig\ResourceException;
+use SpeedyConfig\ResourceNotFoundException;
 
 /**
- * PhpLoader
+ * PhpLoader.
  *
  * @author Glynn Forrest <me@glynnforrest.com>
  **/
@@ -14,7 +15,7 @@ class PhpLoader implements LoaderInterface
     public function load($resource)
     {
         if (!is_file($resource)) {
-            throw new ResourceException(sprintf('"%s" not found.', $resource));
+            throw new ResourceNotFoundException(sprintf('"%s" not found.', $resource));
         }
 
         ob_start();

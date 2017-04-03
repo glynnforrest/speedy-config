@@ -43,7 +43,7 @@ class PhpLoaderTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadThrowsExceptionWithNoFile()
     {
-        $this->setExpectedException('SpeedyConfig\ResourceException');
+        $this->setExpectedException('SpeedyConfig\ResourceNotFoundException');
         $this->loader->load('some_file.php');
     }
 

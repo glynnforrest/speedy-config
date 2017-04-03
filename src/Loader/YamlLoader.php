@@ -5,9 +5,10 @@ namespace SpeedyConfig\Loader;
 use SpeedyConfig\ResourceException;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
+use SpeedyConfig\ResourceNotFoundException;
 
 /**
- * YamlLoader
+ * YamlLoader.
  *
  * @author Glynn Forrest <me@glynnforrest.com>
  **/
@@ -16,7 +17,7 @@ class YamlLoader implements LoaderInterface
     public function load($resource)
     {
         if (!is_file($resource)) {
-            throw new ResourceException(sprintf('"%s" not found.', $resource));
+            throw new ResourceNotFoundException(sprintf('"%s" not found.', $resource));
         }
 
         try {
