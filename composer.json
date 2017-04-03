@@ -6,8 +6,11 @@
         "glynnforrest/crutches": "^0.3.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.2",
+        "phpunit/phpunit": "^5.7",
         "symfony/yaml": "^3.0"
+    },
+    "suggest": {
+        "symfony/yaml": "To use the yaml processor"
     },
     "license": "MIT",
     "authors": [
