@@ -23,4 +23,18 @@ class Node
     {
         return $this->rules;
     }
+
+    public function isRequired()
+    {
+        $this->rules[] = new RequiredRule();
+
+        return $this;
+    }
+
+    public function hasType($type)
+    {
+        $this->rules[] = new TypeRule($type);
+
+        return $this;
+    }
 }
