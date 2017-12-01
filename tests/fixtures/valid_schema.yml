@@ -1,0 +1,9 @@
+integer: 200
+deeply:
+    nested:
+        integer: 100
+
+one:
+    two:
+        three: '123'
+        four: '124'

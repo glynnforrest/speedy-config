@@ -20,7 +20,7 @@ class ErrorCollection implements \Countable, \IteratorAggregate
 
     public function getAll()
     {
-        return array_reduce($this->errors, function($carry, $keyErrors) {
+        return array_reduce($this->errors, function ($carry, $keyErrors) {
             return array_merge($carry, $keyErrors);
         }, []);
     }
