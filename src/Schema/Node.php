@@ -37,4 +37,11 @@ class Node
 
         return $this;
     }
+
+    public function hasCount($count)
+    {
+        $this->rules[] = new CountRule($count);
+
+        return $this;
+    }
 }
