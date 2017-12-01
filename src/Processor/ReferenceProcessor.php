@@ -4,6 +4,7 @@ namespace SpeedyConfig\Processor;
 
 use SpeedyConfig\Config;
 use SpeedyConfig\KeyException;
+use SpeedyConfig\Schema\Schema;
 
 /**
  * ReferenceProcessor resolves references to other configuration keys
@@ -15,7 +16,7 @@ class ReferenceProcessor implements ProcessorInterface
 {
     protected $referenceStack = [];
 
-    public function onPostMerge(Config $config)
+    public function onPostMerge(Config $config, Schema $schema)
     {
         try {
             foreach ($config as $key => $value) {

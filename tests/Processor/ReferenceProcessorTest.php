@@ -4,6 +4,7 @@ namespace SpeedyConfig\Tests\Processor;
 
 use SpeedyConfig\Processor\ReferenceProcessor;
 use SpeedyConfig\Config;
+use SpeedyConfig\Schema\Schema;
 
 /**
  * ReferenceProcessorTest.
@@ -105,7 +106,7 @@ class ReferenceProcessorTest extends \PHPUnit_Framework_TestCase
     public function testPostMerge($original, $expected)
     {
         $config = new Config($original);
-        $this->processor->onPostMerge($config);
+        $this->processor->onPostMerge($config, new Schema());
         $this->assertSame($expected, $config->get());
     }
 
@@ -115,7 +116,7 @@ class ReferenceProcessorTest extends \PHPUnit_Framework_TestCase
             'foo' => '%bar%',
         ]);
         $this->setExpectedException('SpeedyConfig\KeyException');
-        $this->processor->onPostMerge($config);
+        $this->processor->onPostMerge($config, new Schema());
     }
 
     public function circularReferenceProvider()
@@ -160,7 +161,7 @@ class ReferenceProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $config = new Config($config);
         $this->setExpectedException('SpeedyConfig\KeyException');
-        $this->processor->onPostMerge($config);
+        $this->processor->onPostMerge($config, new Schema());
     }
 
     public function testReferenceToArrayThrowsException()
@@ -172,6 +173,6 @@ class ReferenceProcessorTest extends \PHPUnit_Framework_TestCase
             'bar' => '%foo%',
         ]);
         $this->setExpectedException('SpeedyConfig\KeyException');
-        $this->processor->onPostMerge($config);
+        $this->processor->onPostMerge($config, new Schema());
     }
 }

@@ -3,6 +3,7 @@
 namespace SpeedyConfig\Processor;
 
 use SpeedyConfig\Config;
+use SpeedyConfig\Schema\Schema;
 
 /**
  * ProcessorInterface
@@ -16,5 +17,5 @@ interface ProcessorInterface
      *
      * @var Config $config
      */
-    public function onPostMerge(Config $config);
+    public function onPostMerge(Config $config, Schema $schema);
 }

@@ -2,6 +2,8 @@
 
 namespace SpeedyConfig;
 
+use SpeedyConfig\Schema\Schema;
+
 /**
  * ConfigBuilder loads resources using the supplied loaders, processes
  * the configuration using the supplied processors, and returns a
@@ -84,8 +86,12 @@ class ConfigBuilder
      *
      * @return Config
      */
-    public function getConfig()
+    public function getConfig(Schema $schema = null)
     {
+        if (!$schema) {
+            $schema = new Schema();
+        }
+
         $config = new Config();
 
         foreach ($this->resources as $resource) {
@@ -100,7 +106,7 @@ class ConfigBuilder
         }
 
         foreach ($this->processors as $processor) {
-            $processor->onPostMerge($config);
+            $processor->onPostMerge($config, $schema);
         }
 
         return $config;
