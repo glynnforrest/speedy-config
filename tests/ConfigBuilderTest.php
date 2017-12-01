@@ -107,15 +107,6 @@ class ConfigBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expected, $config->get());
     }
 
-    public function testLoadArray()
-    {
-        $builder = new ConfigBuilder();
-        $builder->addResource(['one' => 1, 'two' => 2]);
-        $config = $builder->getConfig();
-        $this->assertInstanceOf(Config::class, $config);
-        $this->assertSame(['one' => 1, 'two' => 2], $config->get());
-    }
-
     public function testProcessorIsCalledAfterMerge()
     {
         $processor = $this->createMock(ProcessorInterface::class);

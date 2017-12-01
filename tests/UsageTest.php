@@ -6,6 +6,7 @@ use SpeedyConfig\ConfigBuilder;
 use SpeedyConfig\Loader\PhpLoader;
 use SpeedyConfig\Loader\YamlLoader;
 use SpeedyConfig\Processor\ReferenceProcessor;
+use SpeedyConfig\Loader\ArrayLoader;
 
 /**
  * UsageTest.
@@ -28,6 +29,14 @@ class UsageTest extends \PHPUnit_Framework_TestCase
         $builder->addResource(__DIR__.'/fixtures/config.yml');
         $config = $builder->getConfig();
         $this->assertSame(['one' => 'one.one', 'two' => 'one.two'], $config->get('one'));
+    }
+
+    public function testLoadArray()
+    {
+        $builder = new ConfigBuilder(new ArrayLoader());
+        $builder->addResource(['one' => 1, 'two' => 2]);
+        $config = $builder->getConfig();
+        $this->assertSame(['one' => 1, 'two' => 2], $config->get());
     }
 
     public function testYamlWithReferences()

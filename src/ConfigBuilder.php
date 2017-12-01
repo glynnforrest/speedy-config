@@ -60,10 +60,6 @@ class ConfigBuilder
      */
     protected function loadResource($resource, $required)
     {
-        if (is_array($resource)) {
-            return $resource;
-        }
-
         foreach ($this->loaders as $loader) {
             if (!$loader->supports($resource)) {
                 continue;
